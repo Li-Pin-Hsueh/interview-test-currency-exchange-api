@@ -4,6 +4,49 @@ const { query, validationResult } = require('express-validator');
 const app = express();
 const port = 3000;
 
+const EXCHANGE_RATES = {
+  'TWD': {
+    'TWD': 1,
+    'JPY': 3.669,
+    'USD': 0.03281
+  },
+  'JPY': {
+    'TWD': 0.26956,
+    'JPY': 1,
+    'USD': 0.00885
+  },
+  'USD': {
+    'TWD': 30.444,
+    'JPY': 111.801,
+    'USD': 1
+  }
+};
+
+class CurrencyExchangeService {
+  constructor(exchangeRates = EXCHANGE_RATES) {
+      this.exchangeRates = exchangeRates;
+  }
+
+  convert(source, target, amount) {
+      if (!this.exchangeRates[source] || !this.exchangeRates[target]) {
+          throw new Error("Unsupported currency");
+      }
+
+      const rate = this.exchangeRates[source][target];
+      if (!rate) {
+          throw new Error("Missing exchange rate");
+      }
+
+      return (amount * rate).toFixed(2);
+  }
+
+  formatNumber(number) {
+      return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+}
+
+const currencyExchangeService = new CurrencyExchangeService(EXCHANGE_RATES);
+
 app.get('/exchange', [
   query('source').notEmpty().withMessage('Source is required'),
   query('target').notEmpty().withMessage('Target is required'),
@@ -24,7 +67,9 @@ app.get('/exchange', [
   }
 
   try {
-    // TODO: Implement currency exchange logic here
+    const convertedAmount = currencyExchangeService.convert(source, target, parsedAmount);
+    const formattedAmount = currencyExchangeService.formatNumber(convertedAmount);
+    res.json({ msg: "success", amount: formattedAmount });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
