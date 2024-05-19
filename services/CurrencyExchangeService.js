@@ -4,6 +4,7 @@ class CurrencyExchangeService {
   }
 
   convert(source, target, amount) {
+      amount = amount.toFixed(2);
       if (!this.exchangeRates[source] || !this.exchangeRates[target]) {
           throw new Error("Unsupported currency");
       }

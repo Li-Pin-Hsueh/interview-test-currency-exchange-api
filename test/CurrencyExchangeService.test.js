@@ -27,6 +27,10 @@ test('convert USD to TWD', () => {
   expect(currencyExchangeService.convert('USD', 'TWD', 1)).toBe('30.44');
 });
 
+test('convert USD to TWD', () => {
+  expect(currencyExchangeService.convert('USD', 'TWD', 10.333)).toBe('314.49');
+});
+
 test('unsupported currency', () => {
   expect(() => currencyExchangeService.convert('EUR', 'TWD', 1)).toThrow('Unsupported currency');
 });
