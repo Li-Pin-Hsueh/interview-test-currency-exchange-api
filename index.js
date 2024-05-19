@@ -1,5 +1,6 @@
 const express = require('express');
 const { query, validationResult } = require('express-validator');
+const { CurrencyExchangeService } = require('./services/CurrencyExchangeService');
 
 const app = express();
 const port = 3000;
@@ -21,29 +22,6 @@ const EXCHANGE_RATES = {
     'USD': 1
   }
 };
-
-class CurrencyExchangeService {
-  constructor(exchangeRates = EXCHANGE_RATES) {
-      this.exchangeRates = exchangeRates;
-  }
-
-  convert(source, target, amount) {
-      if (!this.exchangeRates[source] || !this.exchangeRates[target]) {
-          throw new Error("Unsupported currency");
-      }
-
-      const rate = this.exchangeRates[source][target];
-      if (!rate) {
-          throw new Error("Missing exchange rate");
-      }
-
-      return (amount * rate).toFixed(2);
-  }
-
-  formatNumber(number) {
-      return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  }
-}
 
 const currencyExchangeService = new CurrencyExchangeService(EXCHANGE_RATES);
 
